@@ -11,6 +11,7 @@ import { errorHandler } from "@middleware/errorHanlder";
  import { initSocket } from "@infrastructure/realtime/socket"; 
  import http from "http";
 export const startServer = async () => {
+  
   dotenv.config()
   await connectDB();
   const app = express();
