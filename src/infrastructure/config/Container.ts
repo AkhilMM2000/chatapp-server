@@ -30,6 +30,10 @@ import { IGoogleAuthUseCase } from "@application/use_cases/user/IGoogleAuthUseCa
 import { GoogleAuthUseCase } from "@application/use_cases/user/GoogleAuthUseCase";
 // import { IAIService } from "@application/services/IAIService";
 // import { GeminiAIService } from "@infrastructure/services/GeminiAIService";
+import { IEmailService } from "@application/services/IEmailService";
+import { NodeMailerService } from "@infrastructure/services/NodeMailerService";
+import { IOTPRepository } from "@domain/repositories/IOTPRepository";
+import { MongoOTPRepository } from "@infrastructure/repositories/MongoOTPRepository";
 
 container.registerSingleton<HashService>(TOKENS.GetHashToken, BcryptHashService);
 container.registerSingleton<IUserRepository>(TOKENS.IUserRepository, MongoUserRepository);
@@ -80,3 +84,6 @@ container.registerSingleton<IAIService>(
   GeminiAIService
 )
 */
+
+container.registerSingleton<IEmailService>(TOKENS.IEmailService, NodeMailerService);
+container.registerSingleton<IOTPRepository>(TOKENS.IOTPRepository, MongoOTPRepository);
