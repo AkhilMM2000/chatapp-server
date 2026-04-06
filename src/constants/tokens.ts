@@ -16,5 +16,7 @@ export const TOKENS = {
   AddParticipantUseCase:Symbol.for('AddParticipantUseCase'),
   ISendMessageUseCase:Symbol.for('ISendMessageUseCase'),
   IGetMessageUseCase:Symbol.for('IGetMessagesUseCase'),
-  GetRoomUseCase:Symbol.for('IGetRoomUseCase')
+  GetRoomUseCase:Symbol.for('IGetRoomUseCase'),
+
 } as const;
+

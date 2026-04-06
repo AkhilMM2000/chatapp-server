@@ -25,7 +25,9 @@ export class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
     try {
       const { name ,email,password } = req.body;
-    console.log(req.body)
+      console.log("register controller",name,email,password)
+     
+    console.log('reach here')
       const user = await this.registerUseCase.execute({ name, email, password });
 
       res.status(HttpStatus.CREATED).json({ user });

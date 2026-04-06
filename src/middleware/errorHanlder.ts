@@ -1,14 +1,8 @@
-
 import { Request, Response, NextFunction } from "express";
-import { AppError } from "@domain/error/appError"; 
+import { AppError } from "@domain/error/appError";
 import { MESSAGES } from "@constants/messages";
 
-export function errorHandler(
-  err: Error,
-  req: Request,
-  res: Response,
-  _next: NextFunction
-) {
+export function errorHandler(err: Error, req: Request, res: Response, _next:NextFunction) {
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
       success: false,
@@ -19,6 +13,6 @@ export function errorHandler(
   console.error("Unexpected error:", err);
   return res.status(500).json({
     success: false,
-    message:MESSAGES.SERVER_ERROR,
+    message: MESSAGES.SERVER_ERROR,
   });
 }

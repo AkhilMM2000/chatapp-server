@@ -13,11 +13,11 @@ export class ChatController {
   constructor(
     @inject(TOKENS.CreateRoomUseCase)
     private chatRoomUseCase: ICreateRoomUseCase,
-     @inject(TOKENS.AddParticipantUseCase)
+    @inject(TOKENS.AddParticipantUseCase)
     private addParticpantUseCase: IAddParticipantUseCase,
     @inject(TOKENS.IGetMessageUseCase)
     private getMessagesUseCase:IGetMessagesUseCase,
-        @inject(TOKENS.GetRoomUseCase)
+    @inject(TOKENS.GetRoomUseCase)
     private getRoomUseCase: IGetRoomUseCase
   
   ) {}

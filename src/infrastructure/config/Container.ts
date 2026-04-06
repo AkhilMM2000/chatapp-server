@@ -28,6 +28,8 @@ import { IGetRoomUseCase } from "@application/use_cases/chat/IGetRoomUseCase";
 import { GetRoomUseCase } from "@application/use_cases/chat/GetRoomUseCase";
 import { IGoogleAuthUseCase } from "@application/use_cases/user/IGoogleAuthUseCase";
 import { GoogleAuthUseCase } from "@application/use_cases/user/GoogleAuthUseCase";
+// import { IAIService } from "@application/services/IAIService";
+// import { GeminiAIService } from "@infrastructure/services/GeminiAIService";
 
 container.registerSingleton<HashService>(TOKENS.GetHashToken, BcryptHashService);
 container.registerSingleton<IUserRepository>(TOKENS.IUserRepository, MongoUserRepository);
@@ -71,3 +73,10 @@ container.registerSingleton<IGoogleAuthUseCase>(
   TOKENS.IGoogleAuthUseCase,
   GoogleAuthUseCase
 )
+
+/*
+container.registerSingleton<IAIService>(
+  TOKENS.AIService,
+  GeminiAIService
+)
+*/
