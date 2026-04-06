@@ -8,6 +8,8 @@ const router = Router();
 
 router
   .post("/register", userController.register.bind(userController))
+  .post("/verify-otp", userController.verifyOtp.bind(userController))
+  .post("/resend-otp", userController.resendOtp.bind(userController))
   .post("/login",userController.login.bind(userController))
   .post('/google',userController.googleAuth.bind(userController))
   .post("/refresh-token",userController.refreshToken.bind(userController))
