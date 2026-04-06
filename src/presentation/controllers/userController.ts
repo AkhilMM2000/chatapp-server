@@ -27,105 +27,80 @@ export class UserController {
    @inject(TOKENS.IGoogleAuthUseCase)
    private googleAuthUseCase:IGoogleAuthUseCase
   ) {}
-  async register(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { name ,email,password } = req.body;
-      await this.startRegistrationUseCase.execute({ name, email, password });
-      res.status(HttpStatus.OK).json({ message: "OTP sent to your email. Please verify to complete registration." });
-    } catch (err) {
-      next(err);
-    }
+  async register(req: Request, res: Response) {
+    const { name, email, password } = req.body;
+    await this.startRegistrationUseCase.execute({ name, email, password });
+    res.status(HttpStatus.OK).json({
+      message: "OTP sent to your email. Please verify to complete registration.",
+    });
   }
 
-  async verifyOtp(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email, otp } = req.body;
-      const user = await this.verifyOTPUseCase.execute(email, otp);
-      res.status(HttpStatus.CREATED).json({ user, message: "Registration successful!" });
-    } catch (err) {
-      next(err);
-    }
+  async verifyOtp(req: Request, res: Response) {
+    const { email, otp } = req.body;
+    const user = await this.verifyOTPUseCase.execute(email, otp);
+    res.status(HttpStatus.CREATED).json({ user, message: "Registration successful!" });
   }
 
-  async resendOtp(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { email } = req.body;
-      await this.resendOTPUseCase.execute(email);
-      res.status(HttpStatus.OK).json({ message: "A new OTP has been sent to your email." });
-    } catch (err) {
-      next(err);
-    }
+  async resendOtp(req: Request, res: Response) {
+    const { email } = req.body;
+    await this.resendOTPUseCase.execute(email);
+    res.status(HttpStatus.OK).json({ message: "A new OTP has been sent to your email." });
   }
- async login(req: Request, res: Response, next: NextFunction) {
-  try {
+  async login(req: Request, res: Response) {
     const { email, password } = req.body;
-    const { accessToken, refreshToken, name } = await this.loginUseCase.execute({ email, password });
-    
+    const { accessToken, refreshToken, name } = await this.loginUseCase.execute({
+      email,
+      password,
+    });
+
     res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === AUTH.PRODUCTION,
-      sameSite:AUTH.STRICT_MODE,
+      sameSite: AUTH.STRICT_MODE,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(HttpStatus.CREATED).json({
       accessToken: accessToken,
-      name
+      name,
     });
-  } catch (err) {
-    next(err);
   }
-}
 
- async refreshToken(req: Request, res: Response, next: NextFunction) {
-  try {
+  async refreshToken(req: Request, res: Response) {
     const refreshToken = req.cookies["refreshToken"];
-
-   const accessToken=await this.refreshTokenUseCase.execute(refreshToken);
-
-     res.status(HttpStatus.CREATED).json({ accessToken });
-  } catch (err) {
-    next(err);
+    const accessToken = await this.refreshTokenUseCase.execute(refreshToken);
+    res.status(HttpStatus.CREATED).json({ accessToken });
   }
-}
 
- async logout(req: Request, res: Response, next: NextFunction) {
-  try {
-
+  async logout(req: Request, res: Response) {
     res.clearCookie(AUTH.REFRESH_TOKEN_COOKIE, {
       httpOnly: true,
-     secure: process.env.NODE_ENV === AUTH.PRODUCTION,
-      sameSite:AUTH.STRICT_MODE,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-
+      secure: process.env.NODE_ENV === AUTH.PRODUCTION,
+      sameSite: AUTH.STRICT_MODE,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-  
-     res.status(HttpStatus.OK).json({ message: MESSAGES.USER_LOGOUT });
-  } catch (err) {
-    next(err);
+    res.status(HttpStatus.OK).json({ message: MESSAGES.USER_LOGOUT });
   }
-}
-async googleAuth(req: Request, res: Response, next: NextFunction) {
-  try {
-    const {  credential } = req.body;
-      console.log(req.body)
-    const {accessToken,refreshToken,name} = await this.googleAuthUseCase.execute({ credential });
-  res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
+
+  async googleAuth(req: Request, res: Response) {
+    const { credential } = req.body;
+    const { accessToken, refreshToken, name } = await this.googleAuthUseCase.execute({
+      credential,
+    });
+
+    res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === AUTH.PRODUCTION,
-      sameSite:AUTH.STRICT_MODE,
+      sameSite: AUTH.STRICT_MODE,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.status(HttpStatus.CREATED).json({
       accessToken: accessToken,
-      name
+      name,
     });
-  } catch (err) {
-    next(err);
   }
-}
 
 }
 

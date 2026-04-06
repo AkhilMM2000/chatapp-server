@@ -5,6 +5,7 @@ import { IOTPRepository } from "@domain/repositories/IOTPRepository";
 import { TOKENS } from "@constants/tokens";
 import { User } from "@domain/models/User";
 import { AppError } from "@domain/error/appError";
+import { ValidationError } from "@domain/error/ValidationError";
 import { MESSAGES } from "@constants/messages";
 import { HttpStatus } from "@constants/httpStatus";
 
@@ -19,11 +20,11 @@ export class VerifyOTP implements IVerifyOTPUseCase {
     const otpData = await this.otpRepository.findByEmail(email);
 
     if (!otpData) {
-      throw new AppError("Verification data expired or not found. Please try again.", HttpStatus.BAD_REQUEST);
+      throw new ValidationError("Verification data expired or not found. Please try again.");
     }
 
     if (otpData.otp !== otp) {
-      throw new AppError("Invalid OTP. Please check your email.", HttpStatus.BAD_REQUEST);
+      throw new ValidationError("Invalid OTP. Please check your email.");
     }
 
     // Create user in main repository

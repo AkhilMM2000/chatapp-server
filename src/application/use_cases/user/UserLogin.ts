@@ -6,6 +6,7 @@ import { IAuthService } from "@application/services/IAuthService";
 import { TOKENS } from "@constants/tokens";
 import { User } from "@domain/models/User";
 import { AppError } from "@domain/error/appError";
+import { UnauthorizedError } from "@domain/error/UnauthorizedError";
 import { MESSAGES } from "@constants/messages";
 import { HttpStatus } from "@constants/httpStatus";
 import { AuthResponse } from "types/AuthResponse"; 
@@ -22,7 +23,7 @@ export class LoginUser implements ILoginUserUseCase {
     const user = await this.userRepository.findByEmailWithPassword(data.email);
 console.log(user,'reach here data')
     if (!user) {
-      throw new AppError(MESSAGES.INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedError(MESSAGES.INVALID_CREDENTIALS);
     }
 
     const isValidPassword = await this.hashService.compare(
@@ -31,7 +32,7 @@ console.log(user,'reach here data')
     );
 
     if (!isValidPassword) {
-      throw new AppError(MESSAGES.INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedError(MESSAGES.INVALID_CREDENTIALS);
     }
 
     const payload = { userId: user.id!, name: user.name! };

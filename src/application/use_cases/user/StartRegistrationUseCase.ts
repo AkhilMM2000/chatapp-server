@@ -7,6 +7,7 @@ import { HashService } from "@application/services/IHashService";
 import { TOKENS } from "@constants/tokens";
 import { User } from "@domain/models/User";
 import { AppError } from "@domain/error/appError";
+import { ConflictError } from "@domain/error/ConflictError";
 import { MESSAGES } from "@constants/messages";
 import { HttpStatus } from "@constants/httpStatus";
 
@@ -22,7 +23,7 @@ export class StartRegistration implements IStartRegistrationUseCase {
   async execute(data: Pick<User, "name" | "email" | "password">): Promise<void> {
     const existing = await this.userRepository.findByEmail(data.email);
     if (existing) {
-      throw new AppError(MESSAGES.USER_EXIST_ALREADY, HttpStatus.CONFLICT);
+      throw new ConflictError(MESSAGES.USER_EXIST_ALREADY);
     }
 
     // Generate 6 digit OTP

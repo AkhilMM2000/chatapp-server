@@ -5,7 +5,7 @@ import cors from 'cors';
 import "./infrastructure/config/Container";
  import { connectDB } from "@infrastructure/database/database";
  import cookieParser from "cookie-parser";
- import { errorHandler } from "@middleware/errorHanlder";
+ import { errorHandler } from "@middleware/errorHandler";
  import userRoutes from './presentation/routes/userRoute'
  import chatRoutes from './presentation/routes/chatRoute'
  import { initSocket } from "@infrastructure/realtime/socket"; 

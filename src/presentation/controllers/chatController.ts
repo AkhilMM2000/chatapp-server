@@ -21,23 +21,19 @@ export class ChatController {
     private getRoomUseCase: IGetRoomUseCase
   
   ) {}
-  async createRoom(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    try {
-      const { roomId } = await this.chatRoomUseCase.execute({
-        createdBy: {
-          userId: req.user?.userId!,
-          name: req.user?.name!,
-        },
-      });
+  async createRoom(req: AuthenticatedRequest, res: Response) {
+    const { roomId } = await this.chatRoomUseCase.execute({
+      createdBy: {
+        userId: req.user?.userId!,
+        name: req.user?.name!,
+      },
+    });
 
-      return res.status(HttpStatus.CREATED).json({ roomId });
-    } catch (err) {
-      next(err);
-    }
+    return res.status(HttpStatus.CREATED).json({ roomId });
   }
-   async addParticipant(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-    try {
-           const { roomId } = req.body;
+
+  async addParticipant(req: AuthenticatedRequest, res: Response) {
+    const { roomId } = req.body;
     const userId = req.user?.userId!;
     const name = req.user?.name!;
 
@@ -48,33 +44,21 @@ export class ChatController {
     });
 
     res.status(HttpStatus.CREATED).json(result);
-    } catch (err) {
-      next(err);
-    }
   }
-async getMessages(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  try {
+  async getMessages(req: AuthenticatedRequest, res: Response) {
     const { roomId } = req.params;
     const limit = parseInt(req.query.limit as string) || 50;
 
     const result = await this.getMessagesUseCase.execute({ roomId, limit });
 
     res.status(HttpStatus.OK).json(result);
-  } catch (err) {
-    next(err);
   }
-}
-async getRoom(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  try {
+
+  async getRoom(req: AuthenticatedRequest, res: Response) {
     const { roomId } = req.params;
-
     const response = await this.getRoomUseCase.execute({ roomId });
-
     res.status(HttpStatus.OK).json(response);
-  } catch (err) {
-    next(err);
   }
-}
 
 
 }
