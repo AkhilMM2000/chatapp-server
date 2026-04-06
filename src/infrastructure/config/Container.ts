@@ -34,6 +34,12 @@ import { IEmailService } from "@application/services/IEmailService";
 import { NodeMailerService } from "@infrastructure/services/NodeMailerService";
 import { IOTPRepository } from "@domain/repositories/IOTPRepository";
 import { MongoOTPRepository } from "@infrastructure/repositories/MongoOTPRepository";
+import { IStartRegistrationUseCase } from "@application/use_cases/user/IStartRegistrationUseCase";
+import { StartRegistration } from "@application/use_cases/user/StartRegistrationUseCase";
+import { IVerifyOTPUseCase } from "@application/use_cases/user/IVerifyOTPUseCase";
+import { VerifyOTP } from "@application/use_cases/user/VerifyOTPUseCase";
+import { IResendOTPUseCase } from "@application/use_cases/user/IResendOTPUseCase";
+import { ResendOTP } from "@application/use_cases/user/ResendOTPUseCase";
 
 container.registerSingleton<HashService>(TOKENS.GetHashToken, BcryptHashService);
 container.registerSingleton<IUserRepository>(TOKENS.IUserRepository, MongoUserRepository);
@@ -86,4 +92,7 @@ container.registerSingleton<IAIService>(
 */
 
 container.registerSingleton<IEmailService>(TOKENS.IEmailService, NodeMailerService);
-container.registerSingleton<IOTPRepository>(TOKENS.IOTPRepository, MongoOTPRepository);
+container.registerSingleton<IOTPRepository>(TOKENS.IOTPRepository, MongoOTPRepository);
+container.registerSingleton<IStartRegistrationUseCase>(TOKENS.StartRegistrationUseCase, StartRegistration);
+container.registerSingleton<IVerifyOTPUseCase>(TOKENS.VerifyOTPUseCase, VerifyOTP);
+container.registerSingleton<IResendOTPUseCase>(TOKENS.ResendOTPUseCase, ResendOTP);

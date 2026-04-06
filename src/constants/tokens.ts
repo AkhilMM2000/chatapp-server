@@ -18,6 +18,9 @@ export const TOKENS = {
   IGetMessageUseCase:Symbol.for('IGetMessagesUseCase'),
   GetRoomUseCase:Symbol.for('IGetRoomUseCase'),
   IEmailService: Symbol.for("IEmailService"),
-  IOTPRepository: Symbol.for("IOTPRepository")
+  IOTPRepository: Symbol.for("IOTPRepository"),
+  StartRegistrationUseCase: Symbol.for("StartRegistrationUseCase"),
+  VerifyOTPUseCase: Symbol.for("VerifyOTPUseCase"),
+  ResendOTPUseCase: Symbol.for("ResendOTPUseCase")
 } as const;
 
