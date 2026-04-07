@@ -11,11 +11,19 @@ export class MongoMessageRepository implements IMessageRepository {
     return this.map(created);
   }
 
-  async getMessagesByRoomId(roomId: string,limit:number): Promise<Message[]> {
-    const messages = await MessageSchema.find({ roomId }).
-    sort({ createdAt: 1 })
-    .limit(limit)
-    .lean();
+  async getMessagesByRoomId(roomId: string, limit: number = 50, cursor?: string): Promise<Message[]> {
+    const query: any = { roomId };
+    if (cursor) {
+      query._id = { $lt: cursor }; // Fetch older messages
+    }
+    
+    const messages = await MessageSchema.find(query)
+      .sort({ createdAt: -1 }) // Sort newest to oldest so we can limit
+      .limit(limit)
+      .lean();
+
+    // Reverse so the frontend gets them chronologically (oldest at top)
+    messages.reverse();
 
     return messages.map((m) => this.map(m));
   }

@@ -10,12 +10,19 @@ import "./infrastructure/config/Container";
  import chatRoutes from './presentation/routes/chatRoute'
  import { initSocket } from "@infrastructure/realtime/socket"; 
  import http from "http";
+  import { pinoHttp } from "pino-http";
+  import { logger } from "@utils/logger";
+  import { correlationMiddleware } from "@middleware/correlationMiddleware";
 export const startServer = async () => {
   
-  dotenv.config()
   await connectDB();
   const app = express();
   const PORT = process.env.PORT || 3000;
+   app.use(correlationMiddleware);
+   app.use(pinoHttp({ 
+     logger,
+     genReqId: (req: any) => req.headers["x-correlation-id"] || req.id
+   }));
   app.use(express.json());
   app.use(cookieParser());
   app.use(cors({

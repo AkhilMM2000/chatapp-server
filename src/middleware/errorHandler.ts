@@ -4,6 +4,7 @@ import { AppError } from "@domain/error/appError";
 import { ValidationError } from "@domain/error/ValidationError";
 import { MESSAGES } from "@constants/messages";
 import { HttpStatus } from "@constants/httpStatus";
+import { logger } from "@utils/logger";
 
 /**
  * Global Error Handling Middleware
@@ -48,9 +49,8 @@ export function errorHandler(
   }
 
   // 4. Unexpected Errors (The "Bugs")
-  console.error("🔥 INTERNAL SERVER ERROR:", {
-    message: err.message,
-    stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
+  logger.error(err, "🔥 INTERNAL SERVER ERROR", {
+    correlationId: req.headers["x-correlation-id"],
     url: req.originalUrl,
     method: req.method,
   });

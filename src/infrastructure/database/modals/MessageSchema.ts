@@ -10,4 +10,6 @@ const MessageSchema = new Schema(
   { timestamps: true }
 );
 
+MessageSchema.index({ roomId: 1, createdAt: -1 });
+
 export default mongoose.model("Message", MessageSchema);

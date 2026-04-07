@@ -4,6 +4,8 @@ import { container } from "tsyringe";
 import { IAuthService } from "@application/services/IAuthService";
 import { TOKENS } from "@constants/tokens";
 import { registerChatHandlers } from "./handlers/chatHandler";
+import { IPresenceRepository } from "@domain/repositories/IPresenceRepository";
+import { registerPresenceHandlers } from "./handlers/presenceHandler"; 
 
 let io: SocketIOServer;
 
@@ -16,6 +18,7 @@ export const initSocket = (httpServer: http.Server) => {
     },
   });
   const authService = container.resolve<IAuthService>(TOKENS.AuthService);
+  const presenceRepository = container.resolve<IPresenceRepository>(TOKENS.IPresenceRepository);
 
   io.use((socket: Socket, next) => {
      const token = socket.handshake.auth.token;
@@ -44,14 +47,38 @@ export const initSocket = (httpServer: http.Server) => {
       return next(new Error("INVALID_TOKEN"));
     }
   });
-  io.on("connection", (socket: Socket) => {
-    console.log(`🔌 Client connected: ${socket.id}`);
-   registerChatHandlers(io, socket);
-  socket.on("ping", (data) => {
-    
-    socket.emit("pong", { msg: "Hello from server 🚀" });
-  });
-    socket.on("disconnect", () => {
+  io.on("connection", async (socket: Socket) => {
+    const user = socket.data.user;
+    console.log(`🔌 Client connected: ${socket.id} (User: ${user.name})`);
+
+    // Add to presence
+    await presenceRepository.add(user.id, socket.id);
+
+    // Notify others that user is online
+    io.emit("USER_STATUS_CHANGE", {
+      userId: user.id,
+      status: "online",
+      onlineCount: (await presenceRepository.getOnlineUserIds()).length,
+    });
+
+    registerChatHandlers(io, socket);
+    registerPresenceHandlers(io, socket);
+
+    socket.on("ping", (data) => {
+      socket.emit("pong", { msg: "Hello from server 🚀" });
+    });
+
+    socket.on("disconnect", async () => {
+      const offlineUserId = await presenceRepository.remove(socket.id);
+      
+      if (offlineUserId) {
+        // Only broadcast if the user is completely offline (no more tabs)
+        io.emit("USER_STATUS_CHANGE", {
+          userId: offlineUserId,
+          status: "offline",
+          onlineCount: (await presenceRepository.getOnlineUserIds()).length,
+        });
+      }
       console.log(`❌ Client disconnected: ${socket.id}`);
     });
   });

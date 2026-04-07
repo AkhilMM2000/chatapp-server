@@ -13,7 +13,8 @@ export class GetMessagesUseCase implements IGetMessagesUseCase {
   async execute(data: IGetMessagesRequestDTO): Promise<IGetMessagesResponseDTO> {
     const messages = await this.messageRepository.getMessagesByRoomId(
       data.roomId,
-      data.limit ?? 50 
+      data.limit ?? 50,
+      data.cursor
     );
 
     return {

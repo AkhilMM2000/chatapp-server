@@ -1,6 +1,7 @@
 export interface IGetMessagesRequestDTO {
   roomId: string;
   limit?: number;
+  cursor?: string;
 }
 
 export interface IMessageDTO {

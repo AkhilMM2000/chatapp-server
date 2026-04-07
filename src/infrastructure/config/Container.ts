@@ -8,6 +8,8 @@ import { RegisterUser } from "@application/use_cases/user/UserRegisterUseCase";
 import { IRegisterUserUseCase } from "@application/use_cases/user/IUserRegisterUseCase";
 import { IAuthService } from "@application/services/IAuthService";
 import { JWTAuthService } from "@infrastructure/services/JwtAuthService";
+import { IAIService } from "@application/services/IAIService";
+import { GeminiAIService } from "@infrastructure/services/GeminiAIService";
 import { ILoginUserUseCase } from "@application/use_cases/user/IUserLogin";
 import { LoginUser } from "@application/use_cases/user/UserLogin";
 import { IRefreshAccessTokenUseCase } from "@application/use_cases/user/IUserRefreshTokenUseCase";
@@ -28,12 +30,12 @@ import { IGetRoomUseCase } from "@application/use_cases/chat/IGetRoomUseCase";
 import { GetRoomUseCase } from "@application/use_cases/chat/GetRoomUseCase";
 import { IGoogleAuthUseCase } from "@application/use_cases/user/IGoogleAuthUseCase";
 import { GoogleAuthUseCase } from "@application/use_cases/user/GoogleAuthUseCase";
-// import { IAIService } from "@application/services/IAIService";
-// import { GeminiAIService } from "@infrastructure/services/GeminiAIService";
 import { IEmailService } from "@application/services/IEmailService";
 import { NodeMailerService } from "@infrastructure/services/NodeMailerService";
 import { IOTPRepository } from "@domain/repositories/IOTPRepository";
 import { MongoOTPRepository } from "@infrastructure/repositories/MongoOTPRepository";
+import { IPresenceRepository } from "@domain/repositories/IPresenceRepository";
+import { InMemoryPresenceRepository } from "@infrastructure/repositories/InMemoryPresenceRepository";
 import { IStartRegistrationUseCase } from "@application/use_cases/user/IStartRegistrationUseCase";
 import { StartRegistration } from "@application/use_cases/user/StartRegistrationUseCase";
 import { IVerifyOTPUseCase } from "@application/use_cases/user/IVerifyOTPUseCase";
@@ -48,7 +50,7 @@ container.registerSingleton<IUserRepository>(TOKENS.IUserRepository, MongoUserRe
 container.registerSingleton<IRegisterUserUseCase>(TOKENS.RegisterUserUseCase, RegisterUser);
 
 container.registerSingleton<IAuthService>(TOKENS.AuthService, JWTAuthService);
-
+container.registerSingleton<IAIService>(TOKENS.IAIService, GeminiAIService);
 container.registerSingleton<ILoginUserUseCase>(TOKENS.LoginUseCase, LoginUser);
 container.registerSingleton<IRefreshAccessTokenUseCase>(
   TOKENS.RefreshtokenUseCase,
@@ -93,6 +95,7 @@ container.registerSingleton<IAIService>(
 
 container.registerSingleton<IEmailService>(TOKENS.IEmailService, NodeMailerService);
 container.registerSingleton<IOTPRepository>(TOKENS.IOTPRepository, MongoOTPRepository);
+container.registerSingleton<IPresenceRepository>(TOKENS.IPresenceRepository, InMemoryPresenceRepository);
 container.registerSingleton<IStartRegistrationUseCase>(TOKENS.StartRegistrationUseCase, StartRegistration);
 container.registerSingleton<IVerifyOTPUseCase>(TOKENS.VerifyOTPUseCase, VerifyOTP);
 container.registerSingleton<IResendOTPUseCase>(TOKENS.ResendOTPUseCase, ResendOTP);

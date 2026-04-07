@@ -5,6 +5,8 @@ import { TOKENS } from "@constants/tokens";
 import { IAddParticipantUseCase } from "@application/use_cases/chat/AddParticipantUseCase";
 import { ISendMessageUseCase } from "@application/use_cases/chat/ISendMessageUseCase";
 import { IRoomRepository } from "@domain/repositories/IRoomRepository";
+import { IMessageRepository } from "@domain/repositories/IMessageRepository";
+import { IAIService } from "@application/services/IAIService";
 
 export const registerChatHandlers = (io: Server, socket: Socket) => {
   const addParticipantUseCase = container.resolve<IAddParticipantUseCase>(
@@ -15,7 +17,10 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
   );
    const roomRepository=container.resolve<IRoomRepository>(
     TOKENS.IChatRoomRepository
-   )
+   );
+   const aiService = container.resolve<IAIService>(TOKENS.IAIService);
+   const messageRepository = container.resolve<IMessageRepository>(TOKENS.IMessageRepository);
+
   // 🔹 Join Room
   socket.on("joinRoom", async ({ roomId }) => {
     try {
@@ -69,6 +74,37 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
 
       // Broadcast to others in room
       socket.to(roomId).emit("newMessage", savedMessage);
+
+      // 🤖 AI Assistant Integration
+      if (content.includes("@assistant")) {
+        // Broadcast AI is typing
+        io.to(roomId).emit("USER_TYPING", { userId: "system_ai", name: "Assistant", status: "typing" });
+
+        try {
+          // Fetch context (last 15 messages)
+          const contextMessages = await messageRepository.getMessagesByRoomId(roomId, 15);
+          
+          // Generate AI response
+          const aiReply = await aiService.generateChatResponse(content, contextMessages);
+          
+          // Stop typing
+          io.to(roomId).emit("USER_TYPING", { userId: "system_ai", name: "Assistant", status: "idle" });
+
+          // Save AI message to DB
+          const savedAiMessage = await sendMessageUseCase.execute({
+            roomId,
+            senderId: "system_ai",
+            senderName: "Assistant",
+            content: aiReply,
+          });
+
+          // Broadcast AI message to everyone in the room
+          io.to(roomId).emit("newMessage", savedAiMessage);
+        } catch (error) {
+          console.error("AI Error:", error);
+          io.to(roomId).emit("USER_TYPING", { userId: "system_ai", name: "Assistant", status: "idle" });
+        }
+      }
     } catch (error) {
       socket.emit("sendMessageError", { message: "Failed to send message" });
     }

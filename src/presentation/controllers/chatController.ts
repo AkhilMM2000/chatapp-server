@@ -48,8 +48,9 @@ export class ChatController {
   async getMessages(req: AuthenticatedRequest, res: Response) {
     const { roomId } = req.params;
     const limit = parseInt(req.query.limit as string) || 50;
+    const cursor = req.query.beforeId as string | undefined;
 
-    const result = await this.getMessagesUseCase.execute({ roomId, limit });
+    const result = await this.getMessagesUseCase.execute({ roomId, limit, cursor });
 
     res.status(HttpStatus.OK).json(result);
   }
