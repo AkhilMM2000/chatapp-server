@@ -60,7 +60,7 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
   });
 
   // 🔹 Send Message
-  socket.on("sendMessage", async ({ roomId, content }) => {
+  socket.on("sendMessage", async ({ roomId, content, type, mediaUrl }) => {
     try {
       const user = socket.data.user;
 
@@ -69,6 +69,8 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
         senderId: user.id,
         senderName: user.name,
         content,
+        type,
+        mediaUrl,
       });
 
       // Send message back to sender (ack)

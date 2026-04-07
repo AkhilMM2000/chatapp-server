@@ -35,6 +35,8 @@ export class MongoMessageRepository implements IMessageRepository {
       senderId: doc.senderId,
       senderName: doc.senderName,
       content: doc.content,
+      type: doc.type,
+      mediaUrl: doc.mediaUrl,
       createdAt: doc.createdAt,
     };
   }

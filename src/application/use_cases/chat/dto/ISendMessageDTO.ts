@@ -3,6 +3,8 @@ export interface ISendMessageRequestDTO {
   senderId: string;
   content: string;
   senderName: string;
+  type?: 'text' | 'image' | 'file';
+  mediaUrl?: string;
 }
 
 export interface ISendMessageResponseDTO {
@@ -11,5 +13,7 @@ export interface ISendMessageResponseDTO {
   senderId: string;
   senderName: string;
   content: string;
+  type?: 'text' | 'image' | 'file';
+  mediaUrl?: string;
   createdAt: Date;
 }

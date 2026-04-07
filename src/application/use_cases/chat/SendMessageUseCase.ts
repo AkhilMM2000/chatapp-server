@@ -21,6 +21,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       senderId: data.senderId,
       content: data.content,
       senderName:data.senderName,
+      type: data.type || 'text',
+      mediaUrl: data.mediaUrl,
       createdAt: new Date(),
     });
 
@@ -35,6 +37,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       senderId: savedMessage.senderId,
       content: savedMessage.content,
       senderName:savedMessage.senderName,
+      type: savedMessage.type,
+      mediaUrl: savedMessage.mediaUrl,
       createdAt: savedMessage.createdAt!,
     };
   }

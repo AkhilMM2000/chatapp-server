@@ -4,5 +4,7 @@ export interface Message {
   senderId: string;
   senderName: string;
   content: string;
+  type?: 'text' | 'image' | 'file';
+  mediaUrl?: string;
   createdAt?: Date;
 }

@@ -6,6 +6,8 @@ const MessageSchema = new Schema(
     senderId: { type: String, required: true },
     senderName: { type: String, required: true },
     content: { type: String, required: true },
+    type: { type: String, enum: ['text', 'image', 'file'], default: 'text' },
+    mediaUrl: { type: String },
   },
   { timestamps: true }
 );
