@@ -6,8 +6,9 @@ import "./infrastructure/config/Container";
  import { connectDB } from "@infrastructure/database/database";
  import cookieParser from "cookie-parser";
  import { errorHandler } from "@middleware/errorHandler";
- import userRoutes from './presentation/routes/userRoute'
- import chatRoutes from './presentation/routes/chatRoute'
+ import userRoutes from './presentation/routes/userRoute';
+ import chatRoutes from './presentation/routes/chatRoute';
+ import mediaRoutes from './presentation/routes/mediaRoute';
  import { initSocket } from "@infrastructure/realtime/socket"; 
  import http from "http";
   import { pinoHttp } from "pino-http";
@@ -35,7 +36,8 @@ export const startServer = async () => {
   }));
  
  app.use("/api/auth", userRoutes);
- app.use("/api/chat",chatRoutes)
+ app.use("/api/chat", chatRoutes);
+ app.use("/api/chat/media", mediaRoutes);
 app.use(errorHandler);
 
    const httpServer = http.createServer(app);

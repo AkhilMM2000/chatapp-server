@@ -10,6 +10,8 @@ import { IAuthService } from "@application/services/IAuthService";
 import { JWTAuthService } from "@infrastructure/services/JwtAuthService";
 import { IAIService } from "@application/services/IAIService";
 import { GeminiAIService } from "@infrastructure/services/GeminiAIService";
+import { IMediaService } from "@application/services/IMediaService";
+import { S3MediaService } from "@infrastructure/services/S3MediaService";
 import { IRateLimitRepository } from "@domain/repositories/IRateLimitRepository";
 import { InMemoryRateLimitRepository } from "@infrastructure/repositories/InMemoryRateLimitRepository";
 import { ILoginUserUseCase } from "@application/use_cases/user/IUserLogin";
@@ -98,6 +100,7 @@ container.registerSingleton<IAIService>(
 container.registerSingleton<IEmailService>(TOKENS.IEmailService, NodeMailerService);
 container.registerSingleton<IOTPRepository>(TOKENS.IOTPRepository, MongoOTPRepository);
 container.registerSingleton<IPresenceRepository>(TOKENS.IPresenceRepository, InMemoryPresenceRepository);
+container.registerSingleton<IMediaService>(TOKENS.IMediaService, S3MediaService);
 container.registerSingleton<IRateLimitRepository>(TOKENS.IRateLimitRepository, InMemoryRateLimitRepository);
 container.registerSingleton<IStartRegistrationUseCase>(TOKENS.StartRegistrationUseCase, StartRegistration);
 container.registerSingleton<IVerifyOTPUseCase>(TOKENS.VerifyOTPUseCase, VerifyOTP);
