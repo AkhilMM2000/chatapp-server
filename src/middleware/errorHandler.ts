@@ -17,7 +17,7 @@ export function errorHandler(
 ) {
   // 1. Handle Zod Validation Errors
   if (err instanceof ZodError) {
-    const errorDetails = err.issues.map((e: any) => ({
+    const errors = err.issues.map((e) => ({
       field: e.path.join("."),
       message: e.message,
     }));
@@ -25,7 +25,7 @@ export function errorHandler(
     return res.status(HttpStatus.BAD_REQUEST).json({
       success: false,
       message: "Validation failed",
-      errors: errorDetails,
+      errors,
     });
   }
 

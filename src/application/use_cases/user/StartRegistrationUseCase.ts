@@ -6,10 +6,10 @@ import { IEmailService } from "@application/services/IEmailService";
 import { HashService } from "@application/services/IHashService";
 import { TOKENS } from "@constants/tokens";
 import { User } from "@domain/models/User";
-import { AppError } from "@domain/error/appError";
+
 import { ConflictError } from "@domain/error/ConflictError";
 import { MESSAGES } from "@constants/messages";
-import { HttpStatus } from "@constants/httpStatus";
+
 
 @injectable()
 export class StartRegistration implements IStartRegistrationUseCase {
