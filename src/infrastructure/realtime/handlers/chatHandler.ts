@@ -7,6 +7,7 @@ import { ISendMessageUseCase } from "@application/use_cases/chat/ISendMessageUse
 import { IRoomRepository } from "@domain/repositories/IRoomRepository";
 import { IMessageRepository } from "@domain/repositories/IMessageRepository";
 import { IAIService } from "@application/services/IAIService";
+import { IRateLimitRepository } from "@domain/repositories/IRateLimitRepository";
 
 export const registerChatHandlers = (io: Server, socket: Socket) => {
   const addParticipantUseCase = container.resolve<IAddParticipantUseCase>(
@@ -18,8 +19,9 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
    const roomRepository=container.resolve<IRoomRepository>(
     TOKENS.IChatRoomRepository
    );
-   const aiService = container.resolve<IAIService>(TOKENS.IAIService);
-   const messageRepository = container.resolve<IMessageRepository>(TOKENS.IMessageRepository);
+    const aiService = container.resolve<IAIService>(TOKENS.IAIService);
+    const messageRepository = container.resolve<IMessageRepository>(TOKENS.IMessageRepository);
+    const rateLimitRepository = container.resolve<IRateLimitRepository>(TOKENS.IRateLimitRepository);
 
   // 🔹 Join Room
   socket.on("joinRoom", async ({ roomId }) => {
@@ -77,6 +79,15 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
 
       // 🤖 AI Assistant Integration
       if (content.includes("@assistant")) {
+        // 🔒 Apply Rate Limiting (5 requests per 1 minute)
+        const isAllowed = await rateLimitRepository.isAllowed(`ai:${user.id}`, 5, 60 * 1000);
+        
+        if (!isAllowed) {
+          return socket.emit("sendMessageError", { 
+            message: "Assistant is overwhelmed! Please wait a minute before tagging @assistant again. 🤖✋" 
+          });
+        }
+
         // Broadcast AI is typing
         io.to(roomId).emit("USER_TYPING", { userId: "system_ai", name: "Assistant", status: "typing" });
 

@@ -4,6 +4,7 @@ export const TOKENS = {
   IChatRoomRepository: Symbol.for("IChatRoomRepository"),
   IPresenceRepository: Symbol.for("IPresenceRepository"),
   IAIService: Symbol.for("IAIService"),
+  IRateLimitRepository: Symbol.for("IRateLimitRepository"),
   AuthService: Symbol.for("AuthService"),
   IGoogleAuthUseCase:Symbol.for('IGoogleAuthUseCase'),
   SocketService: Symbol.for("SocketService"),

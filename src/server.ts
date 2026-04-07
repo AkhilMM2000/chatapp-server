@@ -13,12 +13,14 @@ import "./infrastructure/config/Container";
   import { pinoHttp } from "pino-http";
   import { logger } from "@utils/logger";
   import { correlationMiddleware } from "@middleware/correlationMiddleware";
+  import { globalRateLimiter } from "@middleware/rateLimiter";
 export const startServer = async () => {
   
   await connectDB();
   const app = express();
   const PORT = process.env.PORT || 3000;
    app.use(correlationMiddleware);
+   app.use("/api", globalRateLimiter);
    app.use(pinoHttp({ 
      logger,
      genReqId: (req: any) => req.headers["x-correlation-id"] || req.id
