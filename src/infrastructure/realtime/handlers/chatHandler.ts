@@ -8,6 +8,7 @@ import { IRoomRepository } from "@domain/repositories/IRoomRepository";
 import { IMessageRepository } from "@domain/repositories/IMessageRepository";
 import { IAIService } from "@application/services/IAIService";
 import { IRateLimitRepository } from "@domain/repositories/IRateLimitRepository";
+import { IPresenceRepository } from "@domain/repositories/IPresenceRepository";
 
 export const registerChatHandlers = (io: Server, socket: Socket) => {
   const addParticipantUseCase = container.resolve<IAddParticipantUseCase>(
@@ -22,6 +23,7 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
     const aiService = container.resolve<IAIService>(TOKENS.IAIService);
     const messageRepository = container.resolve<IMessageRepository>(TOKENS.IMessageRepository);
     const rateLimitRepository = container.resolve<IRateLimitRepository>(TOKENS.IRateLimitRepository);
+    const presenceRepository = container.resolve<IPresenceRepository>(TOKENS.IPresenceRepository);
 
   // 🔹 Join Room
   socket.on("joinRoom", async ({ roomId }) => {
@@ -43,10 +45,12 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
     
       socket.join(roomId);
 
+      const activeUsers = await presenceRepository.getOnlineUserIds();
       
       socket.emit("roomJoined", {
         roomId,
-        participants: updatedRoom?.participants,
+        participants: updatedRoom?.participants || room?.participants,
+        onlineUsers: activeUsers,
       });
 
       socket.to(roomId).emit("participantJoined", {
