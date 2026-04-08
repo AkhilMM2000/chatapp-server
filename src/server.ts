@@ -20,20 +20,23 @@ export const startServer = async () => {
   await connectDB();
   const app = express();
   const PORT = process.env.PORT || 3000;
+
+  // 1. Move CORS to the VERY TOP (so rate-limited responses still have CORS headers)
+  app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173', 
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+  }));
+
    app.use(correlationMiddleware);
    app.use("/api", globalRateLimiter);
    app.use(pinoHttp({ 
      logger,
      genReqId: (req: any) => req.headers["x-correlation-id"] || req.id
    }));
-  app.use(express.json());
-  app.use(cookieParser());
-  app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5174',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
-  }));
+   app.use(express.json());
+   app.use(cookieParser());
  
  app.use("/api/auth", userRoutes);
  app.use("/api/chat", chatRoutes);

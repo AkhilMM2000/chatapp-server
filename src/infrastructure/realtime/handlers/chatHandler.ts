@@ -45,12 +45,14 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
     
       socket.join(roomId);
 
-      const activeUsers = await presenceRepository.getOnlineUserIds();
+      // 🔍 Fetch only users who are actually in this room
+      const roomSockets = await io.in(roomId).fetchSockets();
+      const roomActiveUserIds = Array.from(new Set(roomSockets.map(s => s.data.user.id)));
       
       socket.emit("roomJoined", {
         roomId,
         participants: updatedRoom?.participants || room?.participants,
-        onlineUsers: activeUsers,
+        onlineUsers: roomActiveUserIds,
       });
 
       socket.to(roomId).emit("participantJoined", {
@@ -130,6 +132,24 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
   socket.on("leaveRoom", ({ roomId, userId, name }) => {
     socket.leave(roomId);
     io.to(roomId).emit("userLeft", { userId, name });
+  });
+
+  socket.on("markAsSeen", async ({ roomId, messageIds }) => {
+    try {
+      const user = socket.data.user;
+      if (!roomId || !messageIds || !messageIds.length) return;
+
+      await messageRepository.markAsSeen(messageIds, user.id);
+
+      // Broadcast to EVERYONE in the room that messages were seen by this user
+      io.to(roomId).emit("messagesSeen", {
+        roomId,
+        messageIds,
+        userId: user.id
+      });
+    } catch (error) {
+      console.error("Mark as seen error:", error);
+    }
   });
 
 

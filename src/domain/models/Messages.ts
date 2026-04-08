@@ -7,4 +7,5 @@ export interface Message {
   type?: 'text' | 'image' | 'file';
   mediaUrl?: string;
   createdAt?: Date;
+  seenBy?: string[];
 }

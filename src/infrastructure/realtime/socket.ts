@@ -68,6 +68,21 @@ export const initSocket = (httpServer: http.Server) => {
       socket.emit("pong", { msg: "Hello from server 🚀" });
     });
 
+    // 🚪 Handle Room Cleanup on Disconnect
+    socket.on("disconnecting", () => {
+      const user = socket.data.user;
+      // socket.rooms contains the rooms the socket is currently in
+      // Room 0 is always the socket.id itself, so we skip it
+      for (const roomId of socket.rooms) {
+        if (roomId !== socket.id) {
+          socket.to(roomId).emit("userLeft", { 
+            userId: user.id, 
+            name: user.name 
+          });
+        }
+      }
+    });
+
     socket.on("disconnect", async () => {
       const offlineUserId = await presenceRepository.remove(socket.id);
       

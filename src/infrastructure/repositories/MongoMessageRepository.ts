@@ -14,18 +14,24 @@ export class MongoMessageRepository implements IMessageRepository {
   async getMessagesByRoomId(roomId: string, limit: number = 50, cursor?: string): Promise<Message[]> {
     const query: any = { roomId };
     if (cursor) {
-      query._id = { $lt: cursor }; // Fetch older messages
+      query._id = { $lt: cursor }; 
     }
     
     const messages = await MessageSchema.find(query)
-      .sort({ createdAt: -1 }) // Sort newest to oldest so we can limit
+      .sort({ createdAt: -1 }) 
       .limit(limit)
       .lean();
 
-    // Reverse so the frontend gets them chronologically (oldest at top)
     messages.reverse();
 
     return messages.map((m) => this.map(m));
+  }
+
+  async markAsSeen(messageIds: string[], userId: string): Promise<void> {
+    await MessageSchema.updateMany(
+      { _id: { $in: messageIds } },
+      { $addToSet: { seenBy: userId } }
+    );
   }
 
   private map(doc: any): Message {
@@ -38,6 +44,7 @@ export class MongoMessageRepository implements IMessageRepository {
       type: doc.type,
       mediaUrl: doc.mediaUrl,
       createdAt: doc.createdAt,
+      seenBy: doc.seenBy || [],
     };
   }
 }
