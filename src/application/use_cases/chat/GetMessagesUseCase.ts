@@ -25,6 +25,9 @@ export class GetMessagesUseCase implements IGetMessagesUseCase {
         senderId: m.senderId,
         content: m.content,
         senderName:m.senderName,
+        senderProfilePic: m.senderProfilePic,
+        type: m.type,
+        mediaUrl: m.mediaUrl,
         createdAt: m.createdAt!,
       })),
     };

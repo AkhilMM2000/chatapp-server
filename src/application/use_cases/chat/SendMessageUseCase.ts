@@ -32,6 +32,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
     }
 
     return {
+      id: savedMessage.id!,
       messageId: savedMessage.id!,
       roomId: savedMessage.roomId,
       senderId: savedMessage.senderId,
