@@ -4,12 +4,15 @@ import { IUserRepository } from "@domain/repositories/IUserRepository";
 import { IUpdateProfileUseCase } from "./IUpdateProfileUseCase";
 import { AppError } from "@domain/error/appError";
 import { HttpStatus } from "@constants/httpStatus";
+import { IRoomRepository } from "@domain/repositories/IRoomRepository";
 
 @injectable()
 export class UpdateProfileUseCase implements IUpdateProfileUseCase {
   constructor(
     @inject(TOKENS.IUserRepository)
-    private userRepository: IUserRepository
+    private userRepository: IUserRepository,
+    @inject(TOKENS.IChatRoomRepository)
+    private roomRepository: IRoomRepository
   ) {}
 
   async execute(userId: string, data: { name?: string; profilePic?: string }): Promise<void> {
@@ -19,5 +22,6 @@ export class UpdateProfileUseCase implements IUpdateProfileUseCase {
     }
 
     await this.userRepository.update(userId, data);
+    await this.roomRepository.updateParticipantProfile(userId, data);
   }
 }
