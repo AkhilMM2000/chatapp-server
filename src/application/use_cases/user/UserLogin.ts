@@ -35,7 +35,7 @@ console.log(user,'reach here data')
       throw new UnauthorizedError(MESSAGES.INVALID_CREDENTIALS);
     }
 
-    const payload = { userId: user.id!, name: user.name! };
+    const payload = { userId: user.id!, name: user.name!, profilePic: user.profilePic };
     const accessToken = this.authService.generateAccessToken(payload);
     const refreshToken = this.authService.generateRefreshToken(payload);
 

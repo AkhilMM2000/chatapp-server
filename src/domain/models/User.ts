@@ -2,6 +2,6 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  password: string;   // should never be returned
- 
+  password: string;
+  profilePic?: string;
 }

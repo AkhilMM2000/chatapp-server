@@ -40,6 +40,7 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
         roomId,
         userId: user.id,
         name: user.name,
+        profilePic: user.profilePic,
       });
     }
     
@@ -58,6 +59,7 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
       socket.to(roomId).emit("participantJoined", {
         userId: user.id,
         name: user.name,
+        profilePic: user.profilePic,
       });
     } catch (error) {
       console.log(error)
@@ -74,6 +76,7 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
         roomId,
         senderId: user.id,
         senderName: user.name,
+        senderProfilePic: user.profilePic,
         content,
         type,
         mediaUrl,

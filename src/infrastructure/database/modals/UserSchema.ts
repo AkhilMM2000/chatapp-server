@@ -5,7 +5,7 @@ export interface IUserDocument extends Document {
   name: string;
   email: string;
   password: string;
-  profile?: string;
+  profilePic?: string;
 }
 
 const UserSchema = new Schema<IUserDocument>(
@@ -13,7 +13,7 @@ const UserSchema = new Schema<IUserDocument>(
     name: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, lowercase: true },
     password: { type: String, required: true },
-    profile: { type: String, default: "" }, // could be URL for profile image
+    profilePic: { type: String, default: "" }, 
   },
   {
     timestamps: true, // createdAt, updatedAt

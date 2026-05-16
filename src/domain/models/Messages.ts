@@ -3,6 +3,7 @@ export interface Message {
   roomId: string;
   senderId: string;
   senderName: string;
+  senderProfilePic?: string;
   content: string;
   type?: 'text' | 'image' | 'file';
   mediaUrl?: string;

@@ -40,6 +40,7 @@ export class MongoMessageRepository implements IMessageRepository {
       roomId: doc.roomId,
       senderId: doc.senderId,
       senderName: doc.senderName,
+      senderProfilePic: doc.senderProfilePic,
       content: doc.content,
       type: doc.type,
       mediaUrl: doc.mediaUrl,

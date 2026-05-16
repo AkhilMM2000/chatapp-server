@@ -18,7 +18,7 @@ export class AddParticipant implements IAddParticipantUseCase {
     
     const updatedRoom = await this.roomRepository.addParticipant(
       data.roomId,
-      { userId: data.userId, name: data.name } 
+      { userId: data.userId, name: data.name, profilePic: data.profilePic } 
     );
 
     if (!updatedRoom) {

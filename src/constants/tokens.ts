@@ -24,6 +24,7 @@ export const TOKENS = {
   IOTPRepository: Symbol.for("IOTPRepository"),
   StartRegistrationUseCase: Symbol.for("StartRegistrationUseCase"),
   VerifyOTPUseCase: Symbol.for("VerifyOTPUseCase"),
-  ResendOTPUseCase: Symbol.for("ResendOTPUseCase")
+  ResendOTPUseCase: Symbol.for("ResendOTPUseCase"),
+  UpdateProfileUseCase: Symbol.for("UpdateProfileUseCase"),
 } as const;
 

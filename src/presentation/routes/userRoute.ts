@@ -18,6 +18,7 @@ router
   .post("/google", catchAsync(userController.googleAuth.bind(userController)))
   .post("/refresh-token", catchAsync(userController.refreshToken.bind(userController)))
   .post("/refresh", catchAsync(userController.refreshToken.bind(userController)))
-  .post("/logout", authMiddleware.protectRoute(), catchAsync(userController.logout.bind(userController)));
+  .post("/logout", authMiddleware.protectRoute(), catchAsync(userController.logout.bind(userController)))
+  .patch("/profile", authMiddleware.protectRoute(), catchAsync(userController.updateProfile.bind(userController)));
 //   .get("/me", authMiddleware.protectRoute(), userController.getMe.bind(userController));
 export default router;

@@ -1,6 +1,6 @@
 
 import express from "express";
-import dotenv from 'dotenv'
+
 import cors from 'cors';
 import "./infrastructure/config/Container";
  import { connectDB } from "@infrastructure/database/database";
@@ -25,8 +25,8 @@ export const startServer = async () => {
   app.use(cors({
     origin: process.env.FRONTEND_URL || 'http://localhost:5173', 
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With', 'Accept', 'X-Correlation-Id'],
   }));
 
    app.use(correlationMiddleware);
@@ -39,6 +39,7 @@ export const startServer = async () => {
    app.use(cookieParser());
  
  app.use("/api/auth", userRoutes);
+ app.use("/api/users", userRoutes);
  app.use("/api/chat", chatRoutes);
  app.use("/api/chat/media", mediaRoutes);
 app.use(errorHandler);

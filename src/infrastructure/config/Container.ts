@@ -46,6 +46,8 @@ import { IVerifyOTPUseCase } from "@application/use_cases/user/IVerifyOTPUseCase
 import { VerifyOTP } from "@application/use_cases/user/VerifyOTPUseCase";
 import { IResendOTPUseCase } from "@application/use_cases/user/IResendOTPUseCase";
 import { ResendOTP } from "@application/use_cases/user/ResendOTPUseCase";
+import { IUpdateProfileUseCase } from "@application/use_cases/user/IUpdateProfileUseCase";
+import { UpdateProfileUseCase } from "@application/use_cases/user/UpdateProfileUseCase";
 
 container.registerSingleton<HashService>(TOKENS.GetHashToken, BcryptHashService);
 container.registerSingleton<IUserRepository>(TOKENS.IUserRepository, MongoUserRepository);
@@ -105,3 +107,4 @@ container.registerSingleton<IRateLimitRepository>(TOKENS.IRateLimitRepository, I
 container.registerSingleton<IStartRegistrationUseCase>(TOKENS.StartRegistrationUseCase, StartRegistration);
 container.registerSingleton<IVerifyOTPUseCase>(TOKENS.VerifyOTPUseCase, VerifyOTP);
 container.registerSingleton<IResendOTPUseCase>(TOKENS.ResendOTPUseCase, ResendOTP);
+container.registerSingleton<IUpdateProfileUseCase>(TOKENS.UpdateProfileUseCase, UpdateProfileUseCase);

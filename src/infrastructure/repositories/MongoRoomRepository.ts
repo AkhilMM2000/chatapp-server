@@ -17,7 +17,7 @@ export class MongoRoomRepository implements IRoomRepository {
 
   async addParticipant(
     roomId: string,
-    participant: { userId: string; name: string }
+    participant: { userId: string; name: string; profilePic?: string }
   ): Promise<Room | null> {
     const updated = await RoomSchema.findOneAndUpdate(
       {roomId},
@@ -34,6 +34,17 @@ export class MongoRoomRepository implements IRoomRepository {
   async findByRoomId(roomId: string): Promise<Room | null> {
     const found = await RoomSchema.findOne({ roomId });
     return found ? this.map(found) : null;
+  }
+
+  async updateParticipantProfile(userId: string, data: { name?: string; profilePic?: string }): Promise<void> {
+    const update: any = {};
+    if (data.name) update["participants.$.name"] = data.name;
+    if (data.profilePic !== undefined) update["participants.$.profilePic"] = data.profilePic;
+
+    await RoomSchema.updateMany(
+      { "participants.userId": userId },
+      { $set: update }
+    );
   }
   private map(doc: any): Room {
     return {

@@ -36,6 +36,7 @@ export const initSocket = (httpServer: http.Server) => {
       socket.data.user = {
         id: payload.userId,
         name: payload.name,
+        profilePic: payload.profilePic,
       };
   
       next();

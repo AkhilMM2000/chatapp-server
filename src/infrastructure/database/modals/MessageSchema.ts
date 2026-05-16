@@ -5,6 +5,7 @@ const MessageSchema = new Schema(
     roomId: { type: String, required: true },
     senderId: { type: String, required: true },
     senderName: { type: String, required: true },
+    senderProfilePic: { type: String, default: "" },
     content: { type: String, required: true },
     type: { type: String, enum: ['text', 'image', 'file'], default: 'text' },
     mediaUrl: { type: String },

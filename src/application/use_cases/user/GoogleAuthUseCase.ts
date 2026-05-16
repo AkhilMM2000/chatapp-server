@@ -46,7 +46,7 @@ export class GoogleAuthUseCase implements IGoogleAuthUseCase {
       });
     }
 
-   const jwtpayload = { userId: user.id!, name: user.name! };
+    const jwtpayload = { userId: user.id!, name: user.name!, profilePic: user.profilePic };
     const accessToken = this.authService.generateAccessToken(jwtpayload);
     const refreshToken = this.authService.generateRefreshToken(jwtpayload);
 

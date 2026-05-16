@@ -20,13 +20,13 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       roomId: data.roomId,
       senderId: data.senderId,
       content: data.content,
-      senderName:data.senderName,
+      senderName: data.senderName,
+      senderProfilePic: data.senderProfilePic,
       type: data.type || 'text',
       mediaUrl: data.mediaUrl,
       createdAt: new Date(),
     });
 
-  console.log(savedMessage,'reach here')
     if (!savedMessage) {
       throw new AppError(MESSAGES.FAILED_TOSAVE_MESSAGES, HttpStatus.INTERNAL_ERROR);
     }
@@ -36,7 +36,8 @@ export class SendMessageUseCase implements ISendMessageUseCase {
       roomId: savedMessage.roomId,
       senderId: savedMessage.senderId,
       content: savedMessage.content,
-      senderName:savedMessage.senderName,
+      senderName: savedMessage.senderName,
+      senderProfilePic: savedMessage.senderProfilePic,
       type: savedMessage.type,
       mediaUrl: savedMessage.mediaUrl,
       createdAt: savedMessage.createdAt!,

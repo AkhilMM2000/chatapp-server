@@ -7,6 +7,7 @@ const RoomSchema = new Schema(
       {
         userId: { type: String, required: true },
         name: { type: String, required: true },
+        profilePic: { type: String, default: "" },
       },
     ],
   },

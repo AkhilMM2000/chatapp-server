@@ -10,6 +10,7 @@ export class MediaController {
   ) {}
 
   async getUploadUrl(req: Request, res: Response) {
+    console.log("📸 Requesting Upload URL for Profile:", req.body);
     const { fileName, fileType } = req.body;
 
     if (!fileName || !fileType) {

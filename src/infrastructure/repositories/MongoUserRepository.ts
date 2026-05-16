@@ -14,14 +14,14 @@ export class MongoUserRepository
   implements IUserRepository {
 
   protected map(entity: any): Partial<User> | null {
-  if (!entity) return null;
-  return {
-    id: entity._id.toString(),
-    name: entity.name,
-    email: entity.email,
-    // password excluded
-  };
-}
+    if (!entity) return null;
+    return {
+      id: entity._id.toString(),
+      name: entity.name,
+      email: entity.email,
+      profilePic: entity.profilePic,
+    };
+  }
 
 
   async create(data: Partial<User>): Promise<Partial<User>> {
@@ -56,12 +56,13 @@ async findByEmailWithPassword(email: string): Promise<User | null> {
   const user = await UserSchema.findOne({ email }).lean();
   if (!user) return null;
 
-  return {
-    id: user._id.toString(),
-    name: user.name,
-    email: user.email,
-    password: user.password, // 👈 include password only here
-  };
+    return {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      password: user.password,
+      profilePic: user.profilePic,
+    };
 }
 
   // ---- Extra Method from IUserRepository ----

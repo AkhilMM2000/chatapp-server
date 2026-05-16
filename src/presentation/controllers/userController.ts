@@ -10,22 +10,29 @@ import { IResendOTPUseCase } from "@application/use_cases/user/IResendOTPUseCase
 import { TOKENS } from "@constants/tokens";
 import { AUTH } from "@constants/auth";
 import { ILoginUserUseCase } from "@application/use_cases/user/IUserLogin";
+import { IUpdateProfileUseCase } from "@application/use_cases/user/IUpdateProfileUseCase";
+import { IRoomRepository } from "@domain/repositories/IRoomRepository";
+import { getIO } from "@infrastructure/realtime/socket";
 
 @singleton()
 export class UserController {
-    constructor(
-   @inject(TOKENS.StartRegistrationUseCase)
-   private startRegistrationUseCase: IStartRegistrationUseCase,
-   @inject(TOKENS.VerifyOTPUseCase)
-   private verifyOTPUseCase: IVerifyOTPUseCase,
-   @inject(TOKENS.ResendOTPUseCase)
-   private resendOTPUseCase: IResendOTPUseCase,
-   @inject(TOKENS.LoginUseCase)
-   private loginUseCase:ILoginUserUseCase,
-   @inject (TOKENS.RefreshtokenUseCase)
-   private refreshTokenUseCase:IRefreshAccessTokenUseCase,
-   @inject(TOKENS.IGoogleAuthUseCase)
-   private googleAuthUseCase:IGoogleAuthUseCase
+  constructor(
+    @inject(TOKENS.StartRegistrationUseCase)
+    private startRegistrationUseCase: IStartRegistrationUseCase,
+    @inject(TOKENS.VerifyOTPUseCase)
+    private verifyOTPUseCase: IVerifyOTPUseCase,
+    @inject(TOKENS.ResendOTPUseCase)
+    private resendOTPUseCase: IResendOTPUseCase,
+    @inject(TOKENS.LoginUseCase)
+    private loginUseCase: ILoginUserUseCase,
+    @inject(TOKENS.RefreshtokenUseCase)
+    private refreshTokenUseCase: IRefreshAccessTokenUseCase,
+    @inject(TOKENS.IGoogleAuthUseCase)
+    private googleAuthUseCase: IGoogleAuthUseCase,
+    @inject(TOKENS.UpdateProfileUseCase)
+    private updateProfileUseCase: IUpdateProfileUseCase,
+    @inject(TOKENS.IChatRoomRepository)
+    private roomRepository: IRoomRepository
   ) {}
   async register(req: Request, res: Response) {
     const { name, email, password } = req.body;
@@ -100,6 +107,26 @@ export class UserController {
       accessToken: accessToken,
       name,
     });
+  }
+
+  async updateProfile(req: Request, res: Response) {
+    const userId = (req as any).user.userId; 
+    const { name, profilePic } = req.body;
+    
+    await this.updateProfileUseCase.execute(userId, { name, profilePic });
+
+    // 🔄 Sync across all rooms
+    await this.roomRepository.updateParticipantProfile(userId, { name, profilePic });
+
+    // 📡 Broadcast to everyone online
+    const io = getIO();
+    io.emit("USER_PROFILE_UPDATED", {
+      userId,
+      name,
+      profilePic
+    });
+
+    res.status(HttpStatus.OK).json({ message: "Profile updated successfully!" });
   }
 
 }
