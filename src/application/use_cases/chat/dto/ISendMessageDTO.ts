@@ -9,6 +9,7 @@ export interface ISendMessageRequestDTO {
 }
 
 export interface ISendMessageResponseDTO {
+  id: string;
   messageId: string;
   roomId: string;
   senderId: string;
