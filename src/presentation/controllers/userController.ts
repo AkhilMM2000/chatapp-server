@@ -13,6 +13,7 @@ import { ILoginUserUseCase } from "@application/use_cases/user/IUserLogin";
 import { IUpdateProfileUseCase } from "@application/use_cases/user/IUpdateProfileUseCase";
 import { IRoomRepository } from "@domain/repositories/IRoomRepository";
 import { getIO } from "@infrastructure/realtime/socket";
+import { IAuthService } from "@application/services/IAuthService";
 
 @singleton()
 export class UserController {
@@ -32,7 +33,9 @@ export class UserController {
     @inject(TOKENS.UpdateProfileUseCase)
     private updateProfileUseCase: IUpdateProfileUseCase,
     @inject(TOKENS.IChatRoomRepository)
-    private roomRepository: IRoomRepository
+    private roomRepository: IRoomRepository,
+    @inject(TOKENS.AuthService)
+    private authService: IAuthService
   ) {}
   async register(req: Request, res: Response) {
     const { name, email, password } = req.body;
@@ -126,7 +129,22 @@ export class UserController {
       profilePic
     });
 
-    res.status(HttpStatus.OK).json({ message: "Profile updated successfully!" });
+    // 🔑 Generate new tokens with updated profilePic
+    const payload = { userId, name, profilePic };
+    const accessToken = this.authService.generateAccessToken(payload);
+    const refreshToken = this.authService.generateRefreshToken(payload);
+
+    res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === AUTH.PRODUCTION,
+      sameSite: AUTH.STRICT_MODE,
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    res.status(HttpStatus.OK).json({ 
+      message: "Profile updated successfully!",
+      accessToken
+    });
   }
 
 }
