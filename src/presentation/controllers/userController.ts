@@ -65,8 +65,8 @@ export class UserController {
 
     res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === AUTH.PRODUCTION,
-      sameSite: AUTH.STRICT_MODE,
+      secure: true, // Always secure for cross-site cookies
+      sameSite: process.env.NODE_ENV === AUTH.PRODUCTION ? AUTH.NONE_MODE : AUTH.LAX_MODE,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -77,7 +77,7 @@ export class UserController {
   }
 
   async refreshToken(req: Request, res: Response) {
-    const refreshToken = req.cookies["refreshToken"];
+    const refreshToken = req.cookies[AUTH.REFRESH_TOKEN_COOKIE];
     const accessToken = await this.refreshTokenUseCase.execute(refreshToken);
     res.status(HttpStatus.CREATED).json({ accessToken });
   }
@@ -101,8 +101,8 @@ export class UserController {
 
     res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === AUTH.PRODUCTION,
-      sameSite: AUTH.STRICT_MODE,
+      secure: true,
+      sameSite: process.env.NODE_ENV === AUTH.PRODUCTION ? AUTH.NONE_MODE : AUTH.LAX_MODE,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -136,8 +136,8 @@ export class UserController {
 
     res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === AUTH.PRODUCTION,
-      sameSite: AUTH.STRICT_MODE,
+      secure: true,
+      sameSite: process.env.NODE_ENV === AUTH.PRODUCTION ? AUTH.NONE_MODE : AUTH.LAX_MODE,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
