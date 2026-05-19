@@ -65,8 +65,8 @@ export class UserController {
 
     res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
       httpOnly: true,
-      secure: true, 
-      sameSite: "none",
+      secure: process.env.NODE_ENV === AUTH.PRODUCTION,
+      sameSite: process.env.NODE_ENV === AUTH.PRODUCTION ? AUTH.NONE_MODE : AUTH.LAX_MODE,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -101,8 +101,8 @@ export class UserController {
 
     res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === AUTH.PRODUCTION,
+      sameSite: process.env.NODE_ENV === AUTH.PRODUCTION ? AUTH.NONE_MODE : AUTH.LAX_MODE,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -136,8 +136,8 @@ export class UserController {
 
     res.cookie(AUTH.REFRESH_TOKEN_COOKIE, refreshToken, {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: process.env.NODE_ENV === AUTH.PRODUCTION,
+      sameSite: process.env.NODE_ENV === AUTH.PRODUCTION ? AUTH.NONE_MODE : AUTH.LAX_MODE,
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
