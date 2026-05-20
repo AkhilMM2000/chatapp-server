@@ -48,7 +48,14 @@ import { IResendOTPUseCase } from "@application/use_cases/user/IResendOTPUseCase
 import { ResendOTP } from "@application/use_cases/user/ResendOTPUseCase";
 import { IUpdateProfileUseCase } from "@application/use_cases/user/IUpdateProfileUseCase";
 import { UpdateProfileUseCase } from "@application/use_cases/user/UpdateProfileUseCase";
-
+import { IAIRetrievalService } from "@application/services/IAIRetrievalService";
+import { AIRetrievalService } from "@infrastructure/services/AIRetrievalService";
+import { IAIPromptService } from "@application/services/IAIPromptService";
+import { AIPromptService } from "@infrastructure/services/AIPromptService";
+import { IAIContextBuilderService } from "@application/services/IAIContextBuilderService";
+import { AIContextBuilderService } from "@infrastructure/services/AIContextBuilderService";
+import { IGenerateAIResponseUseCase } from "@application/use_cases/chat/IGenerateAIResponseUseCase";
+import { GenerateAIResponseUseCase } from "@application/use_cases/chat/GenerateAIResponseUseCase";
 container.registerSingleton<HashService>(TOKENS.GetHashToken, BcryptHashService);
 container.registerSingleton<IUserRepository>(TOKENS.IUserRepository, MongoUserRepository);
 
@@ -108,3 +115,7 @@ container.registerSingleton<IStartRegistrationUseCase>(TOKENS.StartRegistrationU
 container.registerSingleton<IVerifyOTPUseCase>(TOKENS.VerifyOTPUseCase, VerifyOTP);
 container.registerSingleton<IResendOTPUseCase>(TOKENS.ResendOTPUseCase, ResendOTP);
 container.registerSingleton<IUpdateProfileUseCase>(TOKENS.UpdateProfileUseCase, UpdateProfileUseCase);
+container.registerSingleton<IAIRetrievalService>(TOKENS.IAIRetrievalService, AIRetrievalService);
+container.registerSingleton<IAIPromptService>(TOKENS.IAIPromptService, AIPromptService);
+container.registerSingleton<IAIContextBuilderService>(TOKENS.IAIContextBuilderService, AIContextBuilderService);
+container.registerSingleton<IGenerateAIResponseUseCase>(TOKENS.IGenerateAIResponseUseCase, GenerateAIResponseUseCase);

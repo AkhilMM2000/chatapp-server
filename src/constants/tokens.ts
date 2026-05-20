@@ -26,5 +26,8 @@ export const TOKENS = {
   VerifyOTPUseCase: Symbol.for("VerifyOTPUseCase"),
   ResendOTPUseCase: Symbol.for("ResendOTPUseCase"),
   UpdateProfileUseCase: Symbol.for("UpdateProfileUseCase"),
+  IAIRetrievalService: Symbol.for("IAIRetrievalService"),
+  IAIPromptService: Symbol.for("IAIPromptService"),
+  IAIContextBuilderService: Symbol.for("IAIContextBuilderService"),
+  IGenerateAIResponseUseCase: Symbol.for("IGenerateAIResponseUseCase"),
 } as const;
-

@@ -1,11 +1,11 @@
-import { Message } from "@domain/models/Messages";
+
 
 export interface IAIService {
   /**
-   * Generates a context-aware response based on the chat history.
-   * @param prompt The prompt or question asked to the AI
-   * @param contextMessages The recent messages in the room to provide context
+   * Sends a prompt to the AI model and returns the generated content.
+   * @param prompt The final prompt string to send to the model
+   * @param systemInstruction The system instructions for the model's behavior
    * @returns The AI's generated response
    */
-  generateChatResponse(prompt: string, contextMessages: Message[]): Promise<string>;
+  generateContent(prompt: string, systemInstruction: string): Promise<string>;
 }

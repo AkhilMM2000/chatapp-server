@@ -6,7 +6,7 @@ import { IAddParticipantUseCase } from "@application/use_cases/chat/AddParticipa
 import { ISendMessageUseCase } from "@application/use_cases/chat/ISendMessageUseCase";
 import { IRoomRepository } from "@domain/repositories/IRoomRepository";
 import { IMessageRepository } from "@domain/repositories/IMessageRepository";
-import { IAIService } from "@application/services/IAIService";
+import { IGenerateAIResponseUseCase } from "@application/use_cases/chat/IGenerateAIResponseUseCase";
 import { IRateLimitRepository } from "@domain/repositories/IRateLimitRepository";
 import { IPresenceRepository } from "@domain/repositories/IPresenceRepository";
 
@@ -20,7 +20,9 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
    const roomRepository=container.resolve<IRoomRepository>(
     TOKENS.IChatRoomRepository
    );
-    const aiService = container.resolve<IAIService>(TOKENS.IAIService);
+   const generateAIResponseUseCase = container.resolve<IGenerateAIResponseUseCase>(
+    TOKENS.IGenerateAIResponseUseCase
+   );
     const messageRepository = container.resolve<IMessageRepository>(TOKENS.IMessageRepository);
     const rateLimitRepository = container.resolve<IRateLimitRepository>(TOKENS.IRateLimitRepository);
     const presenceRepository = container.resolve<IPresenceRepository>(TOKENS.IPresenceRepository);
@@ -103,12 +105,12 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
         io.to(roomId).emit("USER_TYPING", { userId: "system_ai", name: "Assistant", status: "typing" });
 
         try {
-          // Fetch context (last 15 messages)
-          const contextMessages = await messageRepository.getMessagesByRoomId(roomId, 15);
-          
-          // Generate AI response
-          const aiReply = await aiService.generateChatResponse(content, contextMessages);
-          
+          // Offload AI orchestration to the new use case
+          const aiReply = await generateAIResponseUseCase.execute({
+            roomId,
+            prompt: content
+          });
+
           // Stop typing
           io.to(roomId).emit("USER_TYPING", { userId: "system_ai", name: "Assistant", status: "idle" });
 
