@@ -10,6 +10,7 @@ const MessageSchema = new Schema(
     type: { type: String, enum: ['text', 'image', 'file'], default: 'text' },
     mediaUrl: { type: String },
     seenBy: { type: [String], default: [] },
+    embedding: { type: [Number], required: false },
   },
   { timestamps: true }
 );

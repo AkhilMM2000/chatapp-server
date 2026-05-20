@@ -30,4 +30,5 @@ export const TOKENS = {
   IAIPromptService: Symbol.for("IAIPromptService"),
   IAIContextBuilderService: Symbol.for("IAIContextBuilderService"),
   IGenerateAIResponseUseCase: Symbol.for("IGenerateAIResponseUseCase"),
+  IEmbeddingService: Symbol.for("IEmbeddingService"),
 } as const;

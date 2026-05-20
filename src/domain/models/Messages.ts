@@ -9,4 +9,5 @@ export interface Message {
   mediaUrl?: string;
   createdAt?: Date;
   seenBy?: string[];
+  embedding?: number[];
 }

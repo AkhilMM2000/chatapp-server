@@ -56,6 +56,9 @@ import { IAIContextBuilderService } from "@application/services/IAIContextBuilde
 import { AIContextBuilderService } from "@infrastructure/services/AIContextBuilderService";
 import { IGenerateAIResponseUseCase } from "@application/use_cases/chat/IGenerateAIResponseUseCase";
 import { GenerateAIResponseUseCase } from "@application/use_cases/chat/GenerateAIResponseUseCase";
+import { IEmbeddingService } from "@application/services/IEmbeddingService";
+import { GeminiEmbeddingService } from "@infrastructure/services/GeminiEmbeddingService";
+
 container.registerSingleton<HashService>(TOKENS.GetHashToken, BcryptHashService);
 container.registerSingleton<IUserRepository>(TOKENS.IUserRepository, MongoUserRepository);
 
@@ -119,3 +122,4 @@ container.registerSingleton<IAIRetrievalService>(TOKENS.IAIRetrievalService, AIR
 container.registerSingleton<IAIPromptService>(TOKENS.IAIPromptService, AIPromptService);
 container.registerSingleton<IAIContextBuilderService>(TOKENS.IAIContextBuilderService, AIContextBuilderService);
 container.registerSingleton<IGenerateAIResponseUseCase>(TOKENS.IGenerateAIResponseUseCase, GenerateAIResponseUseCase);
+container.registerSingleton<IEmbeddingService>(TOKENS.IEmbeddingService, GeminiEmbeddingService);

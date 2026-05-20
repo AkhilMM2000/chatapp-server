@@ -34,6 +34,32 @@ export class MongoMessageRepository implements IMessageRepository {
     );
   }
 
+  async updateEmbedding(messageId: string, embedding: number[]): Promise<void> {
+    await MessageSchema.updateOne({ _id: messageId }, { $set: { embedding } });
+  }
+
+  async getSemanticContext(roomId: string, queryEmbedding: number[], limit: number): Promise<Message[]> {
+    const messages = await MessageSchema.aggregate([
+      {
+        $vectorSearch: {
+          index: "vector_index",
+          path: "embedding",
+          queryVector: queryEmbedding,
+          numCandidates: limit * 10,
+          limit: limit,
+          filter: { roomId: roomId }
+        }
+      }
+    ]);
+
+    // Reverse to chronological order (though vector search returns by similarity, chronological might be better for context)
+    // Actually, usually RAG context is ordered by relevance, but Gemini might prefer chronological. 
+    // We'll leave it as is, or we can sort by createdAt after. Let's sort by createdAt to preserve flow.
+    const sortedMessages = messages.sort((a, b) => a.createdAt - b.createdAt);
+
+    return sortedMessages.map((m) => this.map(m));
+  }
+
   private map(doc: any): Message {
     return {
       id: doc._id.toString(),
@@ -46,6 +72,7 @@ export class MongoMessageRepository implements IMessageRepository {
       mediaUrl: doc.mediaUrl,
       createdAt: doc.createdAt,
       seenBy: doc.seenBy || [],
+      embedding: doc.embedding,
     };
   }
 }
