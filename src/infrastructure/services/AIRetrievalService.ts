@@ -14,4 +14,8 @@ export class AIRetrievalService implements IAIRetrievalService {
   async getRecentContext(roomId: string, limit: number): Promise<Message[]> {
     return await this.messageRepository.getMessagesByRoomId(roomId, limit);
   }
+
+  async getSemanticContext(roomId: string, queryEmbedding: number[], limit: number): Promise<Message[]> {
+    return await this.messageRepository.getSemanticContext(roomId, queryEmbedding, limit);
+  }
 }
