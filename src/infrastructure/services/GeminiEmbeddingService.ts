@@ -14,8 +14,8 @@ export class GeminiEmbeddingService implements IEmbeddingService {
       throw new Error("GOOGLE_API_KEY environment variable is missing.");
     }
     this.genAI = new GoogleGenerativeAI(apiKey);
-    // Use Google's standard embedding model for 768 dimensions
-    this.embeddingModel = process.env.GEMINI_EMBEDDING_MODEL || "text-embedding-004";
+    // Use Google's available embedding model
+    this.embeddingModel = process.env.GEMINI_EMBEDDING_MODEL || "gemini-embedding-2";
   }
 
   async generateEmbedding(text: string): Promise<number[]> {
@@ -29,8 +29,11 @@ export class GeminiEmbeddingService implements IEmbeddingService {
       
       return embedding.values;
     } catch (error) {
+      console.error("🔴 FULL GEMINI EMBEDDING ERROR:", error);
       logger.error(error, "Gemini Embedding processing failed", { textSnippet: text.substring(0, 50) });
       throw new Error("Failed to generate embedding");
     }
   }
 }
+
+
