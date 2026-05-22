@@ -14,6 +14,7 @@ import { IUpdateProfileUseCase } from "@application/use_cases/user/IUpdateProfil
 import { IRoomRepository } from "@domain/repositories/IRoomRepository";
 import { getIO } from "@infrastructure/realtime/socket";
 import { IAuthService } from "@application/services/IAuthService";
+import { IUserRepository } from "@domain/repositories/IUserRepository";
 
 @singleton()
 export class UserController {
@@ -35,7 +36,9 @@ export class UserController {
     @inject(TOKENS.IChatRoomRepository)
     private roomRepository: IRoomRepository,
     @inject(TOKENS.AuthService)
-    private authService: IAuthService
+    private authService: IAuthService,
+    @inject(TOKENS.IUserRepository)
+    private userRepository: IUserRepository
   ) {}
   async register(req: Request, res: Response) {
     const { name, email, password } = req.body;
@@ -115,22 +118,36 @@ export class UserController {
   async updateProfile(req: Request, res: Response) {
     const userId = (req as any).user.userId; 
     const { name, profilePic } = req.body;
+    const existingUser = await this.userRepository.findById(userId);
+    const resolvedName =
+      typeof name === "string" && name.trim()
+        ? name.trim()
+        : existingUser?.name?.trim() || "User";
+    const resolvedProfilePic =
+      profilePic !== undefined ? profilePic : existingUser?.profilePic;
+    const updateData: { name: string; profilePic?: string } = {
+      name: resolvedName,
+    };
+
+    if (resolvedProfilePic !== undefined) {
+      updateData.profilePic = resolvedProfilePic;
+    }
     
-    await this.updateProfileUseCase.execute(userId, { name, profilePic });
+    await this.updateProfileUseCase.execute(userId, updateData);
 
     // 🔄 Sync across all rooms
-    await this.roomRepository.updateParticipantProfile(userId, { name, profilePic });
+    await this.roomRepository.updateParticipantProfile(userId, updateData);
 
     // 📡 Broadcast to everyone online
     const io = getIO();
     io.emit("USER_PROFILE_UPDATED", {
       userId,
-      name,
-      profilePic
+      name: resolvedName,
+      profilePic: resolvedProfilePic
     });
 
     // 🔑 Generate new tokens with updated profilePic
-    const payload = { userId, name, profilePic };
+    const payload = { userId, name: resolvedName, profilePic: resolvedProfilePic };
     const accessToken = this.authService.generateAccessToken(payload);
     const refreshToken = this.authService.generateRefreshToken(payload);
 
