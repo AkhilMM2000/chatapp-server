@@ -14,6 +14,8 @@ export class RedisRateLimitRepository implements IRateLimitRepository {
     try {
       // INCR creates the key if it doesn't exist and increments it automatically
       const currentCount = await redisClient.incr(redisKey);
+      
+      console.log(`[Redis] Key: ${redisKey} | Current Count: ${currentCount} | Limit: ${limit}`);
 
       // If it's the very first request in the window, set the expiration timer
       if (currentCount === 1) {

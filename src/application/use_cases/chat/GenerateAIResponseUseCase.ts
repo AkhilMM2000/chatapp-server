@@ -25,7 +25,15 @@ export class GenerateAIResponseUseCase implements IGenerateAIResponseUseCase {
     const finalPrompt = this.promptService.buildChatPrompt(data.prompt, contextMessages);
 
     // 3. Request LLM generation
-    const responseText = await this.aiService.generateContent(finalPrompt, systemInstruction);
+    const timeoutMs = 15000;
+    const timeoutPromise = new Promise<string>((_, reject) => 
+      setTimeout(() => reject(new Error(`AI Request timed out after ${timeoutMs}ms`)), timeoutMs)
+    );
+
+    const responseText = await Promise.race([
+      this.aiService.generateContent(finalPrompt, systemInstruction),
+      timeoutPromise
+    ]);
 
     return responseText;
   }

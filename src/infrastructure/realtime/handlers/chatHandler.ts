@@ -52,6 +52,8 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
       const roomSockets = await io.in(roomId).fetchSockets();
       const roomActiveUserIds = Array.from(new Set(roomSockets.map(s => s.data.user.id)));
       
+      console.log(`[Backend Socket] Socket ${socket.id} (User: ${user.name}) joined Room ${roomId}. Total sockets in room: ${roomSockets.length}`);
+      
       socket.emit("roomJoined", {
         roomId,
         participants: updatedRoom?.participants || room?.participants,
@@ -73,6 +75,7 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
   socket.on("sendMessage", async ({ roomId, content, type, mediaUrl }) => {
     try {
       const user = socket.data.user;
+      console.log(`[Backend Socket] Received sendMessage from Socket ${socket.id} (User: ${user.name}) in Room ${roomId}`);
 
       const savedMessage = await sendMessageUseCase.execute({
         roomId,
@@ -91,11 +94,17 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
       socket.to(roomId).emit("newMessage", savedMessage);
 
       // 🤖 AI Assistant Integration
+      console.log(`[Debug] Checking if message includes @assistant. Message content: "${content}"`);
+      
       if (content.includes("@assistant")) {
-        // 🔒 Apply Rate Limiting (5 requests per 1 minute)
-        const isAllowed = await rateLimitRepository.isAllowed(`ai:${user.id}`, 5, 60 * 1000);
+        console.log(`[Debug] Message contains @assistant! Calling rateLimitRepository.isAllowed...`);
+        // 🔒 Apply Rate Limiting (1 request per 1 minute)
+        const isAllowed = await rateLimitRepository.isAllowed(`ai:${user.id}`, 1, 60 * 1000);
+        
+        console.log(`[Debug] isAllowed returned: ${isAllowed}`);
         
         if (!isAllowed) {
+          console.log(`[Chat] Rate limit HIT for user: ${user.name}! Emitting sendMessageError to client.`);
           return socket.emit("sendMessageError", { 
             message: "Assistant is overwhelmed! Please wait a minute before tagging @assistant again. 🤖✋" 
           });
@@ -159,3 +168,4 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
 
 
 };
+

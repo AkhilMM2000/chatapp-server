@@ -54,7 +54,9 @@ export class RedisPresenceRepository implements IPresenceRepository {
   }
 
   async getOnlineUserIds(): Promise<string[]> {
+    
     // Returns the entire set of online users
     return await redisClient.smembers('global:online_users');
   }
 }
+

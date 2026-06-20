@@ -20,7 +20,7 @@ export class SendMessageUseCase implements ISendMessageUseCase {
   ) {}
 
   async execute(data: ISendMessageRequestDTO): Promise<ISendMessageResponseDTO> {
-    console.log(data,'data have')
+    
     const savedMessage = await this.messageRepository.save({
       roomId: data.roomId,
       senderId: data.senderId,
