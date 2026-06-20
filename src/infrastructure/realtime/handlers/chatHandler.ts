@@ -35,7 +35,7 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
      if(!room){
           return socket.emit("joinRoomError", { message: "This room doesn't exist ❌" });
      }
-     const alreadyExist=room.participants.find(p=>p.userId==user.id);
+     const alreadyExist = room.participants.find(p => p.userId.toString() === user.id.toString());
      let updatedRoom ;
     if(!alreadyExist){
  updatedRoom = await addParticipantUseCase.execute({
