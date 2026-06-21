@@ -8,7 +8,17 @@ import { IRoomRepository } from "@domain/repositories/IRoomRepository";
 import { IMessageRepository } from "@domain/repositories/IMessageRepository";
 import { IGenerateAIResponseUseCase } from "@application/use_cases/chat/IGenerateAIResponseUseCase";
 import { IRateLimitRepository } from "@domain/repositories/IRateLimitRepository";
-import { IPresenceRepository } from "@domain/repositories/IPresenceRepository";
+
+type JoinRoomResponse =
+  | {
+      ok: true;
+      roomId: string;
+      participants: unknown[];
+      onlineUsers: string[];
+    }
+  | { ok: false; message: string };
+
+type JoinRoomAck = (response: JoinRoomResponse) => void;
 
 export const registerChatHandlers = (io: Server, socket: Socket) => {
   const addParticipantUseCase = container.resolve<IAddParticipantUseCase>(
@@ -25,15 +35,22 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
    );
     const messageRepository = container.resolve<IMessageRepository>(TOKENS.IMessageRepository);
     const rateLimitRepository = container.resolve<IRateLimitRepository>(TOKENS.IRateLimitRepository);
-    const presenceRepository = container.resolve<IPresenceRepository>(TOKENS.IPresenceRepository);
 
   // 🔹 Join Room
-  socket.on("joinRoom", async ({ roomId }) => {
+  socket.on("joinRoom", async ({ roomId }: { roomId?: string }, acknowledge?: JoinRoomAck) => {
+    const reply = (response: JoinRoomResponse) => {
+      if (acknowledge) acknowledge(response);
+    };
+
     try {
       const user = socket.data.user;
- const room=await roomRepository.findByRoomId(roomId);
+      if (!roomId || typeof roomId !== "string") {
+        return reply({ ok: false, message: "A valid room ID is required" });
+      }
+
+      const room=await roomRepository.findByRoomId(roomId);
      if(!room){
-          return socket.emit("joinRoomError", { message: "This room doesn't exist ❌" });
+          return reply({ ok: false, message: "This room doesn't exist" });
      }
      const alreadyExist = room.participants.find(p => p.userId.toString() === user.id.toString());
      let updatedRoom ;
@@ -46,28 +63,32 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
       });
     }
     
-      socket.join(roomId);
+      const wasAlreadyJoined = socket.rooms.has(roomId);
+      await socket.join(roomId);
 
       // 🔍 Fetch only users who are actually in this room
       const roomSockets = await io.in(roomId).fetchSockets();
       const roomActiveUserIds = Array.from(new Set(roomSockets.map(s => s.data.user.id)));
       
-      console.log(`[Backend Socket] Socket ${socket.id} (User: ${user.name}) joined Room ${roomId}. Total sockets in room: ${roomSockets.length}`);
+      console.log(`[Socket:join] socket=${socket.id} user=${user.id} room=${roomId} roomSockets=${roomSockets.length}`);
       
-      socket.emit("roomJoined", {
+      reply({
+        ok: true,
         roomId,
         participants: updatedRoom?.participants || room?.participants,
         onlineUsers: roomActiveUserIds,
       });
 
-      socket.to(roomId).emit("participantJoined", {
-        userId: user.id,
-        name: user.name,
-        profilePic: user.profilePic,
-      });
+      if (!wasAlreadyJoined) {
+        socket.to(roomId).emit("participantJoined", {
+          userId: user.id,
+          name: user.name,
+          profilePic: user.profilePic,
+        });
+      }
     } catch (error) {
-      console.log(error)
-      socket.emit("joinRoomError", { message: "Failed to join room" });
+      console.error(`[Socket:join:error] socket=${socket.id}`, error);
+      reply({ ok: false, message: "Failed to join room" });
     }
   });
 
@@ -75,7 +96,11 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
   socket.on("sendMessage", async ({ roomId, content, type, mediaUrl }) => {
     try {
       const user = socket.data.user;
-      console.log(`[Backend Socket] Received sendMessage from Socket ${socket.id} (User: ${user.name}) in Room ${roomId}`);
+      if (!roomId || !socket.rooms.has(roomId)) {
+        return socket.emit("sendMessageError", { message: "Join the room before sending messages" });
+      }
+
+      console.log(`[Socket:send] socket=${socket.id} user=${user.id} room=${roomId}`);
 
       const savedMessage = await sendMessageUseCase.execute({
         roomId,
@@ -92,11 +117,13 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
 
       // Broadcast to others in room
       socket.to(roomId).emit("newMessage", savedMessage);
+      const roomSockets = await io.in(roomId).fetchSockets();
+      console.log(`[Socket:broadcast] message=${savedMessage.id} room=${roomId} recipients=${Math.max(0, roomSockets.length - 1)}`);
 
       // 🤖 AI Assistant Integration
       console.log(`[Debug] Checking if message includes @assistant. Message content: "${content}"`);
       
-      if (content.includes("@assistant")) {
+      if (content?.includes("@assistant")) {
         console.log(`[Debug] Message contains @assistant! Calling rateLimitRepository.isAllowed...`);
         // 🔒 Apply Rate Limiting (1 request per 1 minute)
         const isAllowed = await rateLimitRepository.isAllowed(`ai:${user.id}`, 1, 60 * 1000);
@@ -139,13 +166,19 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
         }
       }
     } catch (error) {
+      console.error(`[Socket:send:error] socket=${socket.id} room=${roomId}`, error);
       socket.emit("sendMessageError", { message: "Failed to send message" });
     }
   });
   
-  socket.on("leaveRoom", ({ roomId, userId, name }) => {
-    socket.leave(roomId);
-    io.to(roomId).emit("userLeft", { userId, name });
+  socket.on("leaveRoom", async ({ roomId }: { roomId?: string }) => {
+    if (!roomId || !socket.rooms.has(roomId)) return;
+
+    const user = socket.data.user;
+    await socket.leave(roomId);
+    const remainingSockets = await io.in(roomId).fetchSockets();
+    console.log(`[Socket:leave] socket=${socket.id} user=${user.id} room=${roomId} roomSockets=${remainingSockets.length}`);
+    io.to(roomId).emit("userLeft", { userId: user.id, name: user.name });
   });
 
   socket.on("markAsSeen", async ({ roomId, messageIds }) => {

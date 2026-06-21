@@ -50,7 +50,7 @@ export const initSocket = (httpServer: http.Server) => {
   });
   io.on("connection", async (socket: Socket) => {
     const user = socket.data.user;
-    console.log(`🔌 Client connected: ${socket.id} (User: ${user.name})`);
+    console.log(`[Socket:connect] socket=${socket.id} user=${user.id} name=${user.name}`);
 
     // Add to presence
     await presenceRepository.add(user.id, socket.id);
@@ -72,6 +72,8 @@ export const initSocket = (httpServer: http.Server) => {
     // 🚪 Handle Room Cleanup on Disconnect
     socket.on("disconnecting", () => {
       const user = socket.data.user;
+      const joinedRooms = [...socket.rooms].filter((roomId) => roomId !== socket.id);
+      console.log(`[Socket:disconnecting] socket=${socket.id} user=${user.id} rooms=${joinedRooms.join(",") || "none"}`);
       // socket.rooms contains the rooms the socket is currently in
       // Room 0 is always the socket.id itself, so we skip it
       for (const roomId of socket.rooms) {
@@ -95,7 +97,7 @@ export const initSocket = (httpServer: http.Server) => {
           onlineCount: (await presenceRepository.getOnlineUserIds()).length,
         });
       }
-      console.log(`❌ Client disconnected: ${socket.id}`);
+      console.log(`[Socket:disconnect] socket=${socket.id} user=${user.id}`);
     });
   });
 
