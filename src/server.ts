@@ -39,6 +39,11 @@ export const startServer = async () => {
   app.use(express.json());
   app.use(cookieParser());
 
+  // Health check route for AWS testing
+  app.get("/api/health", (req, res) => {
+    res.status(200).json({ status: "ok" });
+  });
+
   app.use("/api/auth", userRoutes);
   app.use("/api/users", userRoutes);
   app.use("/api/chat", chatRoutes);
