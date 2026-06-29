@@ -41,7 +41,10 @@ export const startServer = async () => {
 
   // Health check route for AWS testing
   app.get("/api/health", (req, res) => {
-    res.status(200).json({ status: "ok" });
+    res.status(200).json({
+  "status": "ok",
+  "version": "v2"
+});
   });
 
   app.use("/api/auth", userRoutes);
