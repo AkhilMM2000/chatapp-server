@@ -126,7 +126,7 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
       if (content?.includes("@assistant")) {
         console.log(`[Debug] Message contains @assistant! Calling rateLimitRepository.isAllowed...`);
         // 🔒 Apply Rate Limiting (1 request per 1 minute)
-        const isAllowed = await rateLimitRepository.isAllowed(`ai:${user.id}`, 1, 60 * 1000);
+        const isAllowed = await rateLimitRepository.isAllowed(`ai:${user.id}`, 5, 60 * 1000);
         
         console.log(`[Debug] isAllowed returned: ${isAllowed}`);
         

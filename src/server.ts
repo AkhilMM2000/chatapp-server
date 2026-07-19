@@ -1,6 +1,5 @@
 
 import express from "express";
-
 import cors from 'cors';
 import "./infrastructure/config/Container";
 import { connectDB } from "@infrastructure/database/database";
@@ -19,7 +18,7 @@ export const startServer = async () => {
 
   await connectDB();
   const app = express();
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT || 5001;
 
 
   // 1. Move CORS to the VERY TOP (so rate-limited responses still have CORS headers)
@@ -29,6 +28,7 @@ export const startServer = async () => {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie', 'X-Requested-With', 'Accept', 'X-Correlation-Id'],
   }));
+
 
   app.use(correlationMiddleware);
   app.use("/api", globalRateLimiter);
