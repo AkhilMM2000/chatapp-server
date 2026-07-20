@@ -22,7 +22,6 @@
     "@types/node": "^24.3.0",
     "@types/pino-http": "^5.8.4",
     "@types/shortid": "^2.2.0",
-    "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.41.0",
     "@typescript-eslint/parser": "^8.41.0",
     "eslint": "^9.34.0",
@@ -58,7 +57,6 @@
     "shortid": "^2.2.17",
     "socket.io": "^4.8.1",
     "tsyringe": "^4.10.0",
-    "uuid": "^13.0.0",
     "zod": "^4.3.6"
   }
 }

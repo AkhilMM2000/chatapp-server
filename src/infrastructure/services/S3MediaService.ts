@@ -2,7 +2,7 @@ import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { injectable } from "tsyringe";
 import { IMediaService } from "@application/services/IMediaService";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 
 @injectable()
 export class S3MediaService implements IMediaService {
@@ -25,7 +25,7 @@ export class S3MediaService implements IMediaService {
    * The client can PUT to this URL to upload the file directly.
    */
   async getPresignedUrl(fileName: string, fileType: string): Promise<{ uploadUrl: string; key: string }> {
-    const key = `uploads/${uuidv4()}-${fileName}`;
+    const key = `uploads/${randomUUID()}-${fileName}`;
     
     const command = new PutObjectCommand({
       Bucket: this.bucketName,

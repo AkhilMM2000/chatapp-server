@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 
 /**
  * Middleware to attach a unique Correlation ID to every request.
@@ -10,7 +10,7 @@ export const correlationMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  const correlationId = req.header("x-correlation-id") || uuidv4();
+  const correlationId = req.header("x-correlation-id") || randomUUID();
   
   // Set the correlation ID in the request object for later use
   req.headers["x-correlation-id"] = correlationId;
